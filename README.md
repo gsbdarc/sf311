@@ -83,13 +83,42 @@ seasonality (STL remainders), and still **−0.27** with 2020 excluded. So the i
 but real and survives dropping the pandemic year. A plausible common driver — how much time people
 spend outside vs at home — is exactly what the weather experiment below probes.
 
+## Weather
+
+Does weather move complaint volume? Merged daily SF weather (Open-Meteo archive: temperature,
+precipitation) with each per-day complaint rate and regressed on temperature + precipitation,
+controlling for the multi-year trend (year FE) and the lockdown. (`scripts/download_weather.py`,
+`scripts/weather_analysis.py`.)
+
+| | vs temperature | vs precipitation | model adj R² |
+|---|---|---|---|
+| **Noise** | **+9.2 calls/day per +10 °F** (p < 0.001) | n.s. after controlling temp | **0.74** |
+| **Graffiti** | −0.25 bivariate, **not significant** net of trend/COVID | not significant | 0.43 |
+
+![Complaints vs weather](figures/weather_scatter.png)
+
+**Noise complaints track temperature strongly; graffiti reports don't.** Warmer months bring markedly
+more noise complaints (open windows, outdoor socializing), explaining ~three-quarters of the monthly
+variation together with trend and lockdown. Graffiti reporting has no robust weather relationship.
+Noise's raw *negative* correlation with rain (r = −0.44) disappears once temperature is included — in
+SF, rain simply coincides with the cold season, so it was the temperature signal in disguise. This
+temperature sensitivity of noise (and its absence for graffiti) is one reason the two series are
+inversely related.
+
+*Caveat:* weather and season are confounded — a warm month is also a summer month — so these
+coefficients describe a weather/time-of-year association, not a weather effect cleanly separated from
+the calendar.
+
 ## Reproduce
 
 ```bash
 pip install -r requirements.txt
 python scripts/download_data.py     # all categories -> data/raw/sf311_<cat>_2017_2022_<date>.csv
+python scripts/download_weather.py  # SF daily weather -> data/raw/sf_weather_2017_2022_<date>.csv
 python scripts/analyze.py           # -> data/processed/*.csv, figures/*.png (COVID question)
-python scripts/seasonality.py       # -> STL + SARIMA seasonality analysis, figures
+python scripts/seasonality.py       # -> STL + SARIMA monthly seasonality, figures
+python scripts/noise_analysis.py    # -> noise/COVID + graffiti-noise relationship
+python scripts/weather_analysis.py  # -> weather vs complaints regressions, figure
 jupyter notebook notebooks/graffiti_covid.ipynb
 ```
 

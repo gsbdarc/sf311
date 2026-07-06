@@ -53,6 +53,26 @@ def monthly_rate(category):
     return m
 
 
+def weather_daily():
+    """Daily SF weather frame (date, tmax_f, tmin_f, tmean_f, precip_in)."""
+    files = sorted(RAW_DIR.glob("sf_weather_2017_2022_*.csv"))
+    if not files:
+        raise SystemExit("No weather file; run `python scripts/download_weather.py` first.")
+    return pd.read_csv(files[-1], parse_dates=["date"])
+
+
+def weather_monthly():
+    """Month-start-indexed weather: mean temp, total precip, count of rainy days."""
+    w = weather_daily().set_index("date")
+    g = w.resample("MS").agg(
+        tmean_f=("tmean_f", "mean"),
+        tmax_f=("tmax_f", "mean"),
+        precip_in=("precip_in", "sum"),
+    )
+    g["rain_days"] = w["precip_in"].gt(0.01).resample("MS").sum()
+    return g
+
+
 def weekly_rate(category, drop_partial=True):
     """Week-start-indexed frame: calls, days, rate (calls/day), and covariates.
 
