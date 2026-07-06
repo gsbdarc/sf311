@@ -109,6 +109,34 @@ inversely related.
 coefficients describe a weather/time-of-year association, not a weather effect cleanly separated from
 the calendar.
 
+## Weekly & day-of-week seasonality
+
+The monthly seasonality above was weak; looking at finer **weekly** resolution (and the raw
+**day-of-week** pattern) for both categories tells a sharper, and contrasting, story.
+(`scripts/seasonality_weekly.py`.)
+
+| | weekly STL strength | week-of-year peak → trough | amplitude | weekend/weekday |
+|---|---|---|---|---|
+| **Graffiti** | 0.38 | wk 9 (early Mar) → wk 52 | **1.41×** | **0.79×** (lower on weekends) |
+| **Noise** | 0.35 | wk 27 (early Jul) → wk 52 | **3.48×** | **1.15×** (Saturday peak) |
+
+![Week-of-year profile](figures/weekly_seasonality_weekofyear.png)
+
+**The two are out of phase, on both time scales.** Within the year, graffiti reports run high in late
+winter/early spring and fade through summer, while noise is the mirror image — low in winter, with a
+big summer peak (and a sharp spike around week 27, the **July 4th** week). Noise's within-year swing
+is far larger (3.5× peak-to-trough vs graffiti's 1.4×), consistent with its temperature sensitivity.
+
+![Day-of-week profile](figures/weekly_seasonality_dayofweek.png)
+
+Within the week they diverge too: **graffiti reports fall on weekends** (highest Monday — consistent
+with commute/ops/business reporting), while **noise complaints rise on weekends, peaking Saturday**
+(nightlife and gatherings). Both dip in the final week of the year — partly a holiday reporting lull.
+
+Together the three experiments paint a consistent picture: graffiti and noise are *different
+phenomena* — inversely correlated, opposite COVID responses, opposite weather sensitivity, and
+out-of-phase seasonal and weekly timing.
+
 ## Reproduce
 
 ```bash
@@ -119,6 +147,7 @@ python scripts/analyze.py           # -> data/processed/*.csv, figures/*.png (CO
 python scripts/seasonality.py       # -> STL + SARIMA monthly seasonality, figures
 python scripts/noise_analysis.py    # -> noise/COVID + graffiti-noise relationship
 python scripts/weather_analysis.py  # -> weather vs complaints regressions, figure
+python scripts/seasonality_weekly.py # -> weekly + day-of-week seasonality for both
 jupyter notebook notebooks/graffiti_covid.ipynb
 ```
 
