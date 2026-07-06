@@ -9,6 +9,7 @@ env/
 # OS
 .DS_Store
 
-# Note: data/processed/ and figures/ ARE committed (small).
-# data/raw/ handling is decided at download time based on file size;
-# if the raw CSV is large it will be added here and documented in the README.
+# Raw data is NOT committed — it is regenerated from DataSF via
+# scripts/download_data.py (see README). data/processed/ and figures/
+# ARE committed (small).
+data/raw/*.csv

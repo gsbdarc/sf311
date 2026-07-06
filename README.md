@@ -51,12 +51,17 @@ An optional DataSF app token avoids API throttling: `export SODA_APP_TOKEN=...`
 ## Layout
 
 ```
-data/raw/          downloaded once, never edited (read-only)
+data/raw/          NOT committed — regenerate with download_data.py (git-ignored)
 data/processed/    aggregated monthly/yearly counts (committed)
 scripts/           download_data.py, analyze.py
 notebooks/         graffiti_covid.ipynb (narrative)
 figures/           generated plots
 ```
+
+**Raw data is not stored in git.** It is fully regenerable from DataSF (`vw6y-z8j6`) — run
+`python scripts/download_data.py` to recreate `data/raw/sf311_graffiti_2017_2022_<date>.csv`
+before running the analysis. This keeps the repo lean (git already compresses the CSV, so there's
+nothing to gain by committing or zipping it) and treats DataSF as the authoritative source.
 
 ## Notes on the data
 
