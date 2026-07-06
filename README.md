@@ -65,11 +65,29 @@ spurious ΔAIC of ~127, which we discarded. The reconciled verdict: seasonality 
 the single seasonal parameter is significant (p≈0.03) while the month block is only borderline
 (p≈0.09). Trend and COVID explain more of the variation than season does.
 
+## Noise complaints & the graffiti–noise relationship
+
+Extends the analysis to **noise** 311 complaints (`service_name like '%Noise%'`, 45,440 records
+2017–2022) and asks whether noise and graffiti move together. (`scripts/noise_analysis.py`.)
+
+**COVID hit the two in opposite directions.** During the Apr–Jun 2020 lockdown, graffiti calls fell
+**−31.6%** vs 2019 while noise calls **rose +81.2%** — and for the full year noise was **+49.4%** vs
+graffiti's +3.5%. Stuck-at-home life meant fewer people out to notice/report street graffiti but far
+more friction with neighbors' noise.
+
+![Graffiti vs noise](figures/noise_vs_graffiti_timeseries.png)
+
+**They are inversely related, not just during COVID.** The monthly per-day rates are negatively
+correlated — Pearson **r = −0.43** raw, **−0.45** after removing each series' trend and 12-month
+seasonality (STL remainders), and still **−0.27** with 2020 excluded. So the inverse pattern is modest
+but real and survives dropping the pandemic year. A plausible common driver — how much time people
+spend outside vs at home — is exactly what the weather experiment below probes.
+
 ## Reproduce
 
 ```bash
 pip install -r requirements.txt
-python scripts/download_data.py     # -> data/raw/sf311_graffiti_2017_2022_<date>.csv
+python scripts/download_data.py     # all categories -> data/raw/sf311_<cat>_2017_2022_<date>.csv
 python scripts/analyze.py           # -> data/processed/*.csv, figures/*.png (COVID question)
 python scripts/seasonality.py       # -> STL + SARIMA seasonality analysis, figures
 jupyter notebook notebooks/graffiti_covid.ipynb

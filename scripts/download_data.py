@@ -1,13 +1,15 @@
-"""Download San Francisco 311 graffiti service requests (2017-2022).
+"""Download San Francisco 311 service requests (2017-2022) by category.
 
-Pulls from the DataSF "311 Cases" Socrata dataset (vw6y-z8j6), filtered to
-graffiti requests, and writes a single date-stamped CSV to data/raw/.
+Pulls from the DataSF "311 Cases" Socrata dataset (vw6y-z8j6), filtered to the
+categories in CATEGORIES, and writes one date-stamped CSV per category to
+data/raw/ (e.g. sf311_graffiti_2017_2022_<date>.csv, sf311_noise_...).
 
 Raw data is written once and never edited in place (see README). Re-running
 produces a new date-stamped file rather than overwriting an old one.
 
 Usage:
-    python scripts/download_data.py
+    python scripts/download_data.py                 # all categories
+    python scripts/download_data.py graffiti        # one category
     SODA_APP_TOKEN=<token> python scripts/download_data.py   # avoids throttling
 """
 
@@ -26,11 +28,13 @@ ENDPOINT = f"https://data.sfgov.org/resource/{DATASET}.json"
 START = "2017-01-01"
 END = "2023-01-01"
 
-WHERE = (
-    "service_name like '%Graffiti%' "
-    f"and requested_datetime >= '{START}' "
-    f"and requested_datetime < '{END}'"
-)
+# category key -> SoQL service_name LIKE pattern.
+#   graffiti: "Graffiti" / "Graffiti Public" / "Graffiti Private"
+#   noise:    "Noise Report" / "Noise"
+CATEGORIES = {
+    "graffiti": "%Graffiti%",
+    "noise": "%Noise%",
+}
 
 # Only the columns the analysis needs, keeps the file small.
 SELECT = (
@@ -42,19 +46,22 @@ PAGE = 50000
 RAW_DIR = Path(__file__).resolve().parents[1] / "data" / "raw"
 
 
-def fetch_all():
-    """Page through the API with $order for stable pagination."""
+def fetch_all(like_pattern):
+    """Page through the API for one service_name LIKE pattern."""
     session = requests.Session()
     token = os.environ.get("SODA_APP_TOKEN")
     if token:
         session.headers["X-App-Token"] = token
 
+    where = (f"service_name like '{like_pattern}' "
+             f"and requested_datetime >= '{START}' "
+             f"and requested_datetime < '{END}'")
     rows = []
     offset = 0
     while True:
         params = {
             "$select": SELECT,
-            "$where": WHERE,
+            "$where": where,
             "$order": "service_request_id",  # stable order for paging
             "$limit": PAGE,
             "$offset": offset,
@@ -69,31 +76,37 @@ def fetch_all():
         if not batch:
             break
         rows.extend(batch)
-        print(f"  fetched {len(rows):>7} rows (offset {offset})", flush=True)
+        print(f"    fetched {len(rows):>7} rows (offset {offset})", flush=True)
         offset += PAGE
         if len(batch) < PAGE:
             break
     return rows
 
 
-def main():
-    print(f"Downloading graffiti 311 cases {START}..{END} from DataSF ({DATASET})")
-    rows = fetch_all()
-    if not rows:
-        sys.exit("ERROR: no rows returned; aborting.")
-
+def download_category(cat, like_pattern):
     import pandas as pd
+
+    print(f"[{cat}] downloading 311 cases {START}..{END} (service_name like '{like_pattern}')")
+    rows = fetch_all(like_pattern)
+    if not rows:
+        sys.exit(f"ERROR: no rows returned for {cat}; aborting.")
 
     df = pd.DataFrame(rows)
     RAW_DIR.mkdir(parents=True, exist_ok=True)
     stamp = date.today().strftime("%Y%m%d")
-    out = RAW_DIR / f"sf311_graffiti_2017_2022_{stamp}.csv"
+    out = RAW_DIR / f"sf311_{cat}_2017_2022_{stamp}.csv"
     df.to_csv(out, index=False)
-
     size_mb = out.stat().st_size / 1e6
-    print(f"\nWrote {len(df):,} rows -> {out} ({size_mb:.1f} MB)")
-    print("service_name values:")
-    print(df["service_name"].value_counts().to_string())
+    print(f"[{cat}] wrote {len(df):,} rows -> {out.name} ({size_mb:.1f} MB)")
+    print(f"[{cat}] service_name values: {df['service_name'].value_counts().to_dict()}\n")
+
+
+def main():
+    wanted = sys.argv[1:] or list(CATEGORIES)
+    for cat in wanted:
+        if cat not in CATEGORIES:
+            sys.exit(f"Unknown category '{cat}'; choose from {list(CATEGORIES)}")
+        download_category(cat, CATEGORIES[cat])
 
 
 if __name__ == "__main__":
