@@ -1,0 +1,2 @@
+stl_seasonal_strength,peak_month,trough_month,peak_trough_ratio,ols_F,ols_p,sarima_seasonal_aic,sarima_plain_aic,sarima_seasonal_ar12,sarima_lr_p
+0.482,Feb,Oct,1.272,1.72,0.09376747955447001,669.4,672.0,0.289,0.031786029200962726
