@@ -1,0 +1,6 @@
+# Pinned for reproducibility (github-for-research: commit the lockfile)
+pandas==2.2.2
+matplotlib==3.9.2
+requests==2.32.3
+jupyter==1.1.1
+nbconvert==7.16.4
