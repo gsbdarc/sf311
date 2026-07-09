@@ -137,6 +137,45 @@ Together the three experiments paint a consistent picture: graffiti and noise ar
 phenomena* — inversely correlated, opposite COVID responses, opposite weather sensitivity, and
 out-of-phase seasonal and weekly timing.
 
+## Cross-city reproduction: the Kansas City COVID-311 paper
+
+We reproduced Tran, Bani-Yaghoub & DeLisle (2023), *"Non-emergency responses in the 311 system
+during the early stage of the COVID-19 pandemic: a case study of Kansas City"*
+([DOI:10.20517/dpr.2022.08](https://dx.doi.org/10.20517/dpr.2022.08), CC-BY 4.0), against SF
+data — same Mar–Aug 2019-vs-2020 comparison. (`scripts/covid_category_reproduction.py`.)
+
+| Paper's claim (Kansas City) | SF result | Reproduces? |
+|---|---|---|
+| Aggregate decline (KC −13%) | **−10.9%** (328,494 → 292,829) | ✅ yes |
+| Decline not universal; categories diverge | 7 of 23 interpretable categories rose, 16 fell | ✅ yes |
+| Street-condition categories fall (mobility ↓) | Street Defects −46%, Streetlights −18%, Blocked Street −17% | ✅ yes |
+| Text-mine free-text to tag COVID (KC 4.3%) | **Not possible** — `service_details` is categorical; **0 of 18** keywords discriminate | ❌ no |
+| Channel shift toward phone during COVID | **Opposite** — SF shifted to the Mobile/Open311 app (56→60%); phone *fell* (28→25%) | ❌ no |
+
+![SF category movers and the noise–graffiti divergence](figures/covid_category_reproduction.png)
+
+**Where SF sits in the cross-city picture.** The paper's headline is that citizen responses are
+*not* spatially homogeneous: NYC noise complaints spiked, Dallas's fell −14%. SF lands firmly in the
+NYC camp, and more extreme — **noise +80.3%** while **graffiti −13.8%** over Mar–Aug (and +81% vs
+−32% in the strict Apr–Jun lockdown). That within-city divergence is the same signal the noise
+experiment above found, now framed as a mobility mechanism: shelter-in-place put people indoors
+(noise ↑) and off the streets (graffiti reporting ↓).
+
+**Novelty verdict.** The paper's *robust* findings reproduce (aggregate decline, category
+heterogeneity, street-condition collapse) but that only adds SF as a confirming third city — not
+new. Two things *are* worth recording: (1) the paper's signature **text-mining method does not
+generalize to SF at all**, because SF's description field is a categorical subtype label rather than
+a narrative — the discriminating pandemic vocabulary (covid, mask, corona, quarantine, social-dist)
+never appears; and (2) SF is a strong **"noise-up" data point** against the NYC/Dallas split, which
+sharpens this repo's existing inverse graffiti↔noise finding into an explicit COVID-mobility story.
+
+**Caveats.** SF's `service_name` taxonomy is messier than KC's clean 15 categories; several large
+movers are relabeling artifacts (Muni Employee/Service Feedback, Abandoned Vehicle −90%) and are
+flagged and excluded from interpretation. The channel comparison is SF's *overall* mix vs the paper's
+COVID-subset split, so it is suggestive, not a like-for-like test. And part of the summer noise peak
+is the temperature effect documented above, not COVID — though 2020's lockdown-window noise sits far
+above any 2019 seasonal baseline, so the pandemic step-change is real.
+
 ## Reproduce
 
 ```bash
@@ -148,6 +187,7 @@ python scripts/seasonality.py       # -> STL + SARIMA monthly seasonality, figur
 python scripts/noise_analysis.py    # -> noise/COVID + graffiti-noise relationship
 python scripts/weather_analysis.py  # -> weather vs complaints regressions, figure
 python scripts/seasonality_weekly.py # -> weekly + day-of-week seasonality for both
+python scripts/covid_category_reproduction.py  # -> Kansas City paper reproduction on SF data
 jupyter notebook notebooks/graffiti_covid.ipynb
 ```
 

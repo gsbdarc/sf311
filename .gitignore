@@ -9,6 +9,9 @@ env/
 # OS
 .DS_Store
 
+# Reference papers (cited by DOI in the README; kept out to stay lean)
+*.pdf
+
 # Raw data is NOT committed — it is regenerated from DataSF via
 # scripts/download_data.py (see README). data/processed/ and figures/
 # ARE committed (small).
