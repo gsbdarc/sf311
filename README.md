@@ -174,3 +174,12 @@ nothing to gain by committing or zipping it) and treats DataSF as the authoritat
   out reporting rather than less graffiti — an important caveat for the COVID question.
 - Analysis starts in 2017 to avoid the 2008–2012 reporting ramp-up (mobile/Open311 adoption) that
   distorts long-run trend comparisons.
+
+## License
+
+Code and data carry different licenses:
+
+- **Code** (`scripts/`, `notebooks/`) is released under the **MIT License** — see [`LICENSE`](LICENSE).
+- **Processed data** (`data/processed/`) is released under **[CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/)**.
+  It is derived from the City of San Francisco's public 311 dataset (DataSF `vw6y-z8j6`), which
+  remains the authoritative source and is owned by the City of San Francisco, not by this project.
