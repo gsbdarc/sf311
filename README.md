@@ -137,6 +137,44 @@ Together the three experiments paint a consistent picture: graffiti and noise ar
 phenomena* — inversely correlated, opposite COVID responses, opposite weather sensitivity, and
 out-of-phase seasonal and weekly timing.
 
+## Does location interact with COVID to drive noise complaints?
+
+The +81% lockdown noise surge is a citywide average — but it hides a strong **spatial interaction**.
+If the driver is "people sheltering at home," the surge should concentrate in dense *residential*
+neighborhoods and fade in *commercial/office* districts that emptied out. It does.
+(`scripts/noise_location_covid.py`.)
+
+| Apr–Jun 2020 vs 2019 | 2019 | 2020 | Change |
+|---|---|---|---|
+| **Bayview Hunters Point** | 47 | 194 | **+313%** |
+| **Western Addition** | 40 | 152 | **+280%** |
+| **West of Twin Peaks** | 21 | 66 | **+214%** |
+| … (27 neighborhoods) | | | |
+| **Chinatown** | 33 | 24 | **−27%** |
+| **Financial District/South Beach** | 188 | 85 | **−55%** |
+| **Mission Bay** | 124 | 44 | **−65%** |
+
+![Noise surge by neighborhood](figures/noise_location_covid.png)
+
+**The effect ranges from −65% to +313% across neighborhoods.** Every residential area rose (most by
++100–300%), while the *only* neighborhoods that **fell** are the commercial/office/transient cores —
+Financial District/South Beach, Mission Bay, and Chinatown — exactly the places that emptied out when
+offices closed and commuters/tourists disappeared.
+
+**The interaction is statistically real.** A difference-in-differences Poisson GLM (`calls ~
+neighborhood × covid`, log-days offset) tests whether the COVID effect varies by location. The counts
+are **overdispersed** (φ ≈ 3.2), so we report the **quasi-Poisson F-test** rather than the
+overconfident naïve Poisson: **F(26, 108) = 4.07, p ≈ 1.3×10⁻⁷** — the neighborhood × COVID
+interaction is highly significant net of each neighborhood's own baseline, and holds under a negative
+binomial cross-check (p ≈ 3×10⁻¹¹). The average lockdown effect is IRR = 1.74 (+74%).
+
+**Caveats.** (1) At the coarser **supervisor-district** resolution (11 units) the interaction
+attenuates to borderline (p ≈ 0.09) — expected, since a district blends residential and commercial
+blocks and averages the contrast away; the signal lives at neighborhood scale. (2) A 2019-vs-2020
+Apr–Jun DiD does not separate the lockdown shock from pre-existing neighborhood trends (e.g. new
+construction). (3) ~6.6% of noise rows have a null neighborhood and are dropped; 14 low-volume
+neighborhoods (2019 baseline < 20) are excluded for stable estimates.
+
 ## Reproduce
 
 ```bash
@@ -148,6 +186,7 @@ python scripts/seasonality.py       # -> STL + SARIMA monthly seasonality, figur
 python scripts/noise_analysis.py    # -> noise/COVID + graffiti-noise relationship
 python scripts/weather_analysis.py  # -> weather vs complaints regressions, figure
 python scripts/seasonality_weekly.py # -> weekly + day-of-week seasonality for both
+python scripts/noise_location_covid.py  # -> neighborhood x COVID interaction on noise
 jupyter notebook notebooks/graffiti_covid.ipynb
 ```
 

@@ -1,0 +1,2 @@
+n_neighborhoods,pooled_covid_pct,pooled_irr,dispersion_phi,interaction_F,interaction_df,interaction_p_quasipoisson,interaction_p_naive_poisson,interaction_significant,district_interaction_p,pct_change_min,pct_change_max
+27,73.9,1.739,3.22,4.07,26,1.294982463083428e-07,1.3417349528435714e-56,True,0.09081211224559319,-64.5,312.8
